@@ -14,19 +14,104 @@ test('offers a skip link and exposes a labelled main navigation', async ({ page 
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
 });
 
+test('keeps the desktop navigation centered in a rounded capsule', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const navigation = page.getByRole('navigation', { name: 'Main navigation' });
+  const box = await navigation.boundingBox();
+  expect(Math.abs((box!.x + box!.width / 2) - 720)).toBeLessThan(4);
+  expect(await navigation.evaluate((element) => Number.parseFloat(getComputedStyle(element).borderTopLeftRadius))).toBeGreaterThanOrEqual(24);
+});
+
+test('keeps the header free of a bottom divider while preserving the nav capsule', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.site-header')).toHaveCSS('border-bottom-width', '0px');
+  await expect(page.getByRole('navigation', { name: 'Main navigation' })).toHaveCSS('border-top-left-radius', '999px');
+});
+
+test('removes the redundant start a project link from both navigations', async ({ page }) => {
+  await page.goto('/');
+  const desktopNavigation = page.getByRole('navigation', { name: 'Main navigation' });
+  await expect(desktopNavigation.getByRole('link', { name: 'Start a project' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: "Let's Talk" }).first()).toHaveAttribute('href', '#contact');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+  await expect(mobileNavigation.getByRole('link', { name: 'Start a project' })).toHaveCount(0);
+  await expect(mobileNavigation.getByRole('link', { name: "Let's Talk" })).toHaveAttribute('href', '#contact');
+});
+
+test('keeps the mobile menu region available to its disclosure button', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const menu = page.getByRole('button', { name: 'Open menu' });
+  const mobileNavigation = page.locator('#mobile-navigation');
+  await expect(mobileNavigation).toHaveCount(1);
+  await expect(mobileNavigation).toBeHidden();
+  await expect(menu).toHaveAttribute('aria-controls', 'mobile-navigation');
+  await menu.click();
+  await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toBeVisible();
+});
+
+test('uses the supplied Cinqode wordmark in the site branding', async ({ page }) => {
+  await page.goto('/');
+  const homeLinks = page.getByRole('link', { name: 'Cinqode home' });
+  await expect(homeLinks).toHaveCount(2);
+  await expect(homeLinks.first().getByRole('img', { name: 'Cinqode' })).toHaveAttribute('src', /cinqode-wordmark/);
+  await expect(homeLinks.last().getByRole('img', { name: 'Cinqode' })).toHaveAttribute('src', /cinqode-wordmark/);
+});
+
+test('uses the supplied Cinqode icon as the browser favicon', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('head link[rel="icon"]')).toHaveAttribute('href', /\/icon\.png(?:\?|$)/);
+});
+
 test('hero CTAs navigate to the intended sections', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('link', { name: 'Explore Services' })).toHaveAttribute('href', '#services');
   await expect(page.getByRole('link', { name: 'View Our Work' })).toHaveAttribute('href', '#work');
 });
 
-test('uses a service heading hierarchy and complete stats', async ({ page }) => {
+test('offers an interactive service selector and complete stats', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 2, name: 'Our Services' })).toBeVisible();
-  await expect(page.getByRole('heading', { level: 3 })).toHaveCount(10);
+  await expect(page.getByRole('tab')).toHaveCount(10);
+  await page.getByRole('tab', { name: 'Web Development' }).click();
+  await expect(page.getByRole('tab', { name: 'Web Development' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByText(/Modern web platforms engineered/)).toBeVisible();
   await expect(page.locator('.stats dl')).toContainText('98%');
   await expect(page.getByText('Client Satisfaction')).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: /Ready to Build Something Amazing/i })).toBeVisible();
+});
+
+test('replaces the service detail panel when a new service is selected', async ({ page }) => {
+  await page.goto('/#services');
+  const detail = page.getByTestId('service-detail');
+  await expect(detail).toHaveAttribute('data-service', 'AI Chatbot');
+
+  await page.getByRole('tab', { name: 'Web Development' }).click();
+  await expect(detail).toHaveAttribute('data-service', 'Web Development');
+  await expect(detail.getByText(/Modern web platforms engineered/)).toBeVisible();
+});
+
+test('updates the service preview image for the selected service', async ({ page }) => {
+  await page.goto('/#services');
+  const preview = page.getByTestId('service-detail').getByRole('img');
+  await expect(preview).toHaveAttribute('src', /ai-chatbot-preview/);
+
+  await page.getByRole('tab', { name: 'Web Development' }).click();
+  await expect(preview).toHaveAttribute('src', /web-development-preview/);
+});
+
+test('keeps the services selector usable on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#services');
+  await page.getByRole('tab', { name: 'Web Development' }).click();
+  await expect(page.getByRole('tab', { name: 'Web Development' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByText(/Modern web platforms engineered/)).toBeVisible();
+  expect(await page.locator('.services-list').evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
 });
 
 test('opens and closes the mobile navigation with a named button', async ({ page }) => {
@@ -81,7 +166,7 @@ test('uses fluid desktop gutters without losing narrow-screen reflow', async ({ 
 
   await page.setViewportSize({ width: 320, height: 844 });
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
 test('keeps left hero service labels close to the animated icon', async ({ page }) => {

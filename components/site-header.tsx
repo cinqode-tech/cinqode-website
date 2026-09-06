@@ -1,18 +1,24 @@
 'use client';
 
+import Image from 'next/image';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const links = [
   ['Home', '#home'], ['Services', '#services'], ['Work', '#work'],
-  ['About', '#about'], ['Process', '#contact'], ['Contact', '#contact'],
+  ['About', '#about'], ['Contact', '#contact'],
 ] as const;
 
 export function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
-    <span className="brand-mark" aria-hidden="true">
-      <span className="brand-symbol">C</span>
-      {!compact && <span className="brand-name">cinqode</span>}
+    <span className={`brand-mark${compact ? ' brand-mark-compact' : ''}`}>
+      <Image
+        alt="Cinqode"
+        height={compact ? 737 : 689}
+        priority
+        src={compact ? '/brand/cinqode-icon.png' : '/brand/cinqode-wordmark.png'}
+        width={compact ? 737 : 3671}
+      />
     </span>
   );
 }
@@ -59,12 +65,10 @@ export function SiteHeader() {
           {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
         </button>
       </div>
-      {open && (
-        <nav className="mobile-nav" id="mobile-navigation" aria-label="Mobile navigation">
-          {links.map(([label, href]) => <a href={href} key={label} onClick={() => handleMobileNavigation(href)}>{label}</a>)}
-          <a className="talk-button" href="#contact" onClick={() => handleMobileNavigation('#contact')}>Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={16} /></a>
-        </nav>
-      )}
+      <nav className="mobile-nav" hidden={!open} id="mobile-navigation" aria-label="Mobile navigation">
+        {links.map(([label, href]) => <a href={href} key={label} onClick={() => handleMobileNavigation(href)}>{label}</a>)}
+        <a className="talk-button" href="#contact" onClick={() => handleMobileNavigation('#contact')}>Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={16} /></a>
+      </nav>
     </header>
   );
 }
