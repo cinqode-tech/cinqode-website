@@ -1,4 +1,5 @@
 import { ArrowRight, Play } from 'lucide-react';
+import Link from 'next/link';
 import { HeroArtwork } from './hero-artwork';
 
 export function Hero() {
@@ -9,7 +10,7 @@ export function Hero() {
         <h1>We Build Digital{' '}<br />Solutions That{' '}<br /><em>Move</em>{' '}You Forward.</h1>
         <p className="hero-description">Cinqode helps businesses and brands unlock their full potential with smart, scalable and future-ready digital solutions.</p>
         <div className="hero-actions">
-          <a className="primary-button" href="#services">Explore Services <ArrowRight aria-hidden="true" size={17} /></a>
+          <Link className="primary-button" href="/services">Explore Services <ArrowRight aria-hidden="true" size={17} /></Link>
           <a className="secondary-button" href="#work">View Our Work <Play aria-hidden="true" size={13} fill="currentColor" /></a>
         </div>
       </div>
