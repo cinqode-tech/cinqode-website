@@ -1,12 +1,13 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const links = [
-  ['Home', '#home'], ['Services', '#services'], ['Work', '#work'],
-  ['About', '#about'], ['Contact', '#contact'],
+  ['Home', '/#home'], ['Services', '/services'], ['Work', '/#work'],
+  ['About', '/#about'], ['Contact', '/#contact'],
 ] as const;
 
 export function BrandMark({ compact = false }: { compact?: boolean }) {
@@ -40,19 +41,24 @@ export function SiteHeader() {
 
   const handleMobileNavigation = (href: string) => {
     setOpen(false);
+    const hash = href.slice(href.indexOf('#'));
     requestAnimationFrame(() => {
-      document.querySelector<HTMLElement>(href)?.focus({ preventScroll: true });
+      document.querySelector<HTMLElement>(hash)?.focus({ preventScroll: true });
     });
   };
 
   return (
     <header className="site-header">
       <div className="shell header-inner">
-        <a className="brand-link" href="#home" aria-label="Cinqode home"><BrandMark /></a>
+        <Link className="brand-link" href="/" aria-label="Cinqode home"><BrandMark /></Link>
         <nav className="desktop-nav" aria-label="Main navigation">
-          {links.map(([label, href]) => <a href={href} key={label}>{label}</a>)}
+          {links.map(([label, href]) => (
+            href.includes('#')
+              ? <a href={href} key={label}>{label}</a>
+              : <Link href={href} key={label}>{label}</Link>
+          ))}
         </nav>
-        <a className="talk-button desktop-talk" href="#contact">Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={15} /></a>
+        <Link className="talk-button desktop-talk" href="/#contact">Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={15} /></Link>
         <button
           ref={buttonRef}
           className="menu-button"
@@ -66,8 +72,12 @@ export function SiteHeader() {
         </button>
       </div>
       <nav className="mobile-nav" hidden={!open} id="mobile-navigation" aria-label="Mobile navigation">
-        {links.map(([label, href]) => <a href={href} key={label} onClick={() => handleMobileNavigation(href)}>{label}</a>)}
-        <a className="talk-button" href="#contact" onClick={() => handleMobileNavigation('#contact')}>Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={16} /></a>
+        {links.map(([label, href]) => (
+          href.includes('#')
+            ? <a href={href} key={label} onClick={() => handleMobileNavigation(href)}>{label}</a>
+            : <Link href={href} key={label} onClick={() => setOpen(false)}>{label}</Link>
+        ))}
+        <Link className="talk-button" href="/#contact" onClick={() => handleMobileNavigation('/#contact')}>Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={16} /></Link>
       </nav>
     </header>
   );
