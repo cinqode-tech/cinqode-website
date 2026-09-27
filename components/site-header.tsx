@@ -2,12 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const links = [
   ['Home', '/#home'], ['Services', '/services'], ['Work', '/#work'],
-  ['About', '/#about'], ['Contact', '/#contact'],
+  ['About', '/about'], ['Contact', '/contact'],
 ] as const;
 
 export function BrandMark({ compact = false }: { compact?: boolean }) {
@@ -27,6 +28,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -55,7 +57,7 @@ export function SiteHeader() {
           {links.map(([label, href]) => (
             href.includes('#')
               ? <a href={href} key={label}>{label}</a>
-              : <Link href={href} key={label}>{label}</Link>
+              : <Link aria-current={pathname === href ? 'page' : undefined} href={href} key={label}>{label}</Link>
           ))}
         </nav>
         <Link className="talk-button desktop-talk" href="/#contact">Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={15} /></Link>
@@ -75,7 +77,7 @@ export function SiteHeader() {
         {links.map(([label, href]) => (
           href.includes('#')
             ? <a href={href} key={label} onClick={() => handleMobileNavigation(href)}>{label}</a>
-            : <Link href={href} key={label} onClick={() => setOpen(false)}>{label}</Link>
+            : <Link aria-current={pathname === href ? 'page' : undefined} href={href} key={label} onClick={() => setOpen(false)}>{label}</Link>
         ))}
         <Link className="talk-button" href="/#contact" onClick={() => handleMobileNavigation('/#contact')}>Let&apos;s Talk <ArrowUpRight aria-hidden="true" size={16} /></Link>
       </nav>

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(node -e  const l=require('lucide-react'); const keys=Object.keys(l).filter(k=>/[A-Z]/.test(k)); console.log('total', keys.length, 'version', require('lucide-react/package.json').version); console.log(keys.filter(k=>/linked|git|twit|face|insta|youtu|brand|share|link|at-|AtSign|Rss|Globe/i.test(k)).join(', ')); )"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}

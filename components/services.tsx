@@ -56,10 +56,10 @@ export function Services() {
           >
             <div className="service-tags">{activeService.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
             <p className="service-description">{activeService.description}</p>
-            <a className="service-detail-link" href="#contact">
+            <Link className="service-detail-link" href={`/services/${activeService.slug}`}>
               Explore {activeService.name} services
               <span aria-hidden="true"><ArrowUpRight size={21} strokeWidth={1.8} /></span>
-            </a>
+            </Link>
             <div className="service-preview">
               <Image alt={`Cinqode ${activeService.name} project dashboard preview`} height={936} priority src={activeService.image} width={1664} />
             </div>
