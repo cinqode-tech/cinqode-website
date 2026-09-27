@@ -78,9 +78,9 @@ test('offers an interactive service selector and complete stats', async ({ page 
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 2, name: 'Our Services' })).toBeVisible();
   await expect(page.getByRole('tab')).toHaveCount(10);
-  await page.getByRole('tab', { name: 'Web Development' }).click();
-  await expect(page.getByRole('tab', { name: 'Web Development' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByText(/Modern web platforms engineered/)).toBeVisible();
+  await page.getByRole('tab', { name: 'Graphic Design' }).click();
+  await expect(page.getByRole('tab', { name: 'Graphic Design' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByText(/Make your brand stand out/)).toBeVisible();
   await expect(page.locator('.stats dl')).toContainText('98%');
   await expect(page.getByText('Client Satisfaction')).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: /Ready to Build Something Amazing/i })).toBeVisible();
@@ -91,9 +91,9 @@ test('replaces the service detail panel when a new service is selected', async (
   const detail = page.getByTestId('service-detail');
   await expect(detail).toHaveAttribute('data-service', 'AI Chatbot');
 
-  await page.getByRole('tab', { name: 'Web Development' }).click();
-  await expect(detail).toHaveAttribute('data-service', 'Web Development');
-  await expect(detail.getByText(/Modern web platforms engineered/)).toBeVisible();
+  await page.getByRole('tab', { name: 'Graphic Design' }).click();
+  await expect(detail).toHaveAttribute('data-service', 'Graphic Design');
+  await expect(detail.getByText(/Make your brand stand out/)).toBeVisible();
 });
 
 test('updates the service preview image for the selected service', async ({ page }) => {
@@ -101,16 +101,16 @@ test('updates the service preview image for the selected service', async ({ page
   const preview = page.getByTestId('service-detail').getByRole('img');
   await expect(preview).toHaveAttribute('src', /ai-chatbot-preview/);
 
-  await page.getByRole('tab', { name: 'Web Development' }).click();
-  await expect(preview).toHaveAttribute('src', /web-development-preview/);
+  await page.getByRole('tab', { name: 'Graphic Design' }).click();
+  await expect(preview).toHaveAttribute('src', /graphic-design-preview/);
 });
 
 test('keeps the services selector usable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#services');
-  await page.getByRole('tab', { name: 'Web Development' }).click();
-  await expect(page.getByRole('tab', { name: 'Web Development' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByText(/Modern web platforms engineered/)).toBeVisible();
+  await page.getByRole('tab', { name: 'Graphic Design' }).click();
+  await expect(page.getByRole('tab', { name: 'Graphic Design' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByText(/Make your brand stand out/)).toBeVisible();
   expect(await page.locator('.services-list').evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
 });
 
