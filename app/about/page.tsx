@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'About — Cinqode',
   description: 'Four minds, one vision: the team behind Cinqode and how we build digital solutions that matter.',
 };
-
+// example
 const skills = [
   { icon: Cpu, label: 'AI & Automation' },
   { icon: CodeXml, label: 'Development' },
